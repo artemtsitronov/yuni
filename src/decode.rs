@@ -3,20 +3,14 @@ use crate::menu::{B, HALF, MINLEN};
 use crate::poly::Poly;
 use crate::root::{ROOT_B, ROOT_HALF, ROOT_LEN};
 
-pub fn explain_build(p: &Poly, depth: u32, e: &Expr) -> Option<Vec<bool>> {
+pub fn explain_build(p: &Poly, e: &Expr) -> Option<Vec<bool>> {
     if eval(e) != *p {
         return None;
-    }
-    if depth == 0 {
-        return if matches!(e, Expr::Leaf(_)) {
-            Some(Vec::new())
-        } else {
-            None
-        };
     }
     let l = p.len().max(MINLEN);
 
     let (fam, a, left, right, lval, rval) = match e {
+        Expr::Leaf(_) => return Some(Vec::new()),
         Expr::Add(x, y) => {
             let a = eval(x);
             let b = p.sub(&a);
@@ -40,8 +34,8 @@ pub fn explain_build(p: &Poly, depth: u32, e: &Expr) -> Option<Vec<bool>> {
         }
         bits.extend(idx_to_bits(v as usize, B));
     }
-    bits.extend(explain_build(&lval, depth - 1, left)?);
-    bits.extend(explain_build(&rval, depth - 1, right)?);
+    bits.extend(explain_build(&lval, left)?);
+    bits.extend(explain_build(&rval, right)?);
     Some(bits)
 }
 
@@ -53,10 +47,10 @@ pub fn root_bits(p: &Poly) -> Vec<bool> {
     bits
 }
 
-pub fn explain(depth: u32, e: &Expr) -> Option<Vec<bool>> {
+pub fn explain(e: &Expr) -> Option<Vec<bool>> {
     let p = eval(e);
     let mut bits = root_bits(&p);
-    bits.extend(explain_build(&p, depth, e)?);
+    bits.extend(explain_build(&p, e)?);
     Some(bits)
 }
 

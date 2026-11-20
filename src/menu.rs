@@ -24,24 +24,24 @@ fn make(p: &Poly, reader: &mut BitReader) -> Expr {
     }
 }
 
-pub fn build(p: &Poly, depth: u32, reader: &mut BitReader) -> Expr {
-    if depth == 0 {
+pub fn build(p: &Poly, depth: u32, reader: &mut BitReader, total: usize) -> Expr {
+    if depth == 0 || reader.pos >= total {
         return Expr::Leaf(p.clone());
     }
     let e = make(p, reader);
-    grow(e, depth - 1, reader)
+    grow(e, depth - 1, reader, total)
 }
 
-fn grow(e: Expr, depth: u32, reader: &mut BitReader) -> Expr {
+fn grow(e: Expr, depth: u32, reader: &mut BitReader, total: usize) -> Expr {
     match e {
         Expr::Add(a, b) => Expr::Add(
-            Box::new(grow(*a, depth, reader)),
-            Box::new(grow(*b, depth, reader)),
+            Box::new(grow(*a, depth, reader, total)),
+            Box::new(grow(*b, depth, reader, total)),
         ),
         Expr::Sub(a, b) => Expr::Sub(
-            Box::new(grow(*a, depth, reader)),
-            Box::new(grow(*b, depth, reader)),
+            Box::new(grow(*a, depth, reader, total)),
+            Box::new(grow(*b, depth, reader, total)),
         ),
-        Expr::Leaf(p) => build(&p, depth, reader),
+        Expr::Leaf(p) => build(&p, depth, reader, total),
     }
 }
