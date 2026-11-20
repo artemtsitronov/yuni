@@ -2,6 +2,7 @@ use crate::bits::bits_for;
 use crate::expr::{Expr, eval};
 use crate::menu::{B, HALF, MINLEN};
 use crate::poly::Poly;
+use crate::root::{ROOT_B, ROOT_HALF, ROOT_LEN};
 
 pub fn explain_build(p: &Poly, depth: u32, e: &Expr) -> Option<Vec<bool>> {
     if eval(e) != *p {
@@ -45,19 +46,19 @@ pub fn explain_build(p: &Poly, depth: u32, e: &Expr) -> Option<Vec<bool>> {
     Some(bits)
 }
 
-fn explain_grow(shape: &Expr, e: &Expr, depth: u32) -> Option<Vec<bool>> {
-    match (shape, e) {
-        (Expr::Leaf(p), _) => explain_build(&p.clone(), depth, e),
-        (Expr::Add(a1, b1), Expr::Add(a2, b2))
-        | (Expr::Sub(a1, b1), Expr::Sub(a2, b2))
-        | (Expr::Mul(a1, b1), Expr::Mul(a2, b2)) => {
-            let mut bits = explain_grow(&a1, a2, depth)?;
-            bits.extend(explain_grow(&b1, b2, depth)?);
-            Some(bits)
-        }
-        (Expr::Pow(a1, e1), Expr::Pow(a2, e2)) if e1 == e2 => explain_grow(&a1, a2, depth),
-        _ => None,
+pub fn root_bits(p: &Poly) -> Vec<bool> {
+    let mut bits = Vec::new();
+    for i in 0..ROOT_LEN {
+        bits.extend(idx_to_bits((p.coeff(i) + ROOT_HALF) as usize, ROOT_B));
     }
+    bits
+}
+
+pub fn explain(depth: u32, e: &Expr) -> Option<Vec<bool>> {
+    let p = eval(e);
+    let mut bits = root_bits(&p);
+    bits.extend(explain_build(&p, depth, e)?);
+    Some(bits)
 }
 
 pub fn idx_to_bits(idx: usize, k: u32) -> Vec<bool> {

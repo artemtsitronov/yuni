@@ -1,25 +1,31 @@
 mod bits;
 mod decode;
 mod expr;
+mod frame;
 mod menu;
 mod poly;
+mod root;
 use bits::BitReader;
-use decode::{bits_to_bytes, explain_build};
+use decode::{bits_to_bytes, explain};
 use expr::{eval, show};
+use frame::{frame, unframe};
 use menu::build;
-use poly::Poly;
+use root::*;
 
-const DEPTH: u32 = 4;
+const DEPTH: u32 = 3;
 
 fn main() {
-    let data = b"Hi!".to_vec();
+    let data = frame(b"Hi!");
 
     let mut r = BitReader::new(data);
-    let p = Poly::constant(8);
+    let p = read_root(&mut r);
     let e = build(&p, DEPTH, &mut r);
     println!("{} = {}", show(&e), eval(&e).show());
 
-    let bits = explain_build(&p, DEPTH, &e).unwrap();
+    let bits = explain(DEPTH, &e).unwrap();
     println!("used {} bits, decoded {} bits", r.pos, bits.len());
-    println!("{}", String::from_utf8_lossy(&bits_to_bytes(&bits)));
+    match unframe(&bits_to_bytes(&bits)) {
+        Some(d) => println!("message: {:?}", String::from_utf8_lossy(&d)),
+        None => println!("Couldn't unframe"),
+    }
 }

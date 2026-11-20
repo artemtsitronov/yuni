@@ -2,9 +2,9 @@ use crate::bits::{BitReader, bits_for};
 use crate::expr::Expr;
 use crate::poly::Poly;
 
-pub const B: u32 = 6;
+pub const B: u32 = 7;
 pub const HALF: i64 = 1 << (B - 1);
-pub const MINLEN: usize = 3;
+pub const MINLEN: usize = 2;
 
 fn make(p: &Poly, reader: &mut BitReader) -> Expr {
     let fam = reader.read(1);
@@ -38,15 +38,10 @@ fn grow(e: Expr, depth: u32, reader: &mut BitReader) -> Expr {
             Box::new(grow(*a, depth, reader)),
             Box::new(grow(*b, depth, reader)),
         ),
-        Expr::Mul(a, b) => Expr::Mul(
-            Box::new(grow(*a, depth, reader)),
-            Box::new(grow(*b, depth, reader)),
-        ),
         Expr::Sub(a, b) => Expr::Sub(
             Box::new(grow(*a, depth, reader)),
             Box::new(grow(*b, depth, reader)),
         ),
-        Expr::Pow(a, e) => Expr::Pow(Box::new(grow(*a, depth, reader)), e),
         Expr::Leaf(p) => build(&p, depth, reader),
     }
 }

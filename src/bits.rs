@@ -1,3 +1,5 @@
+use rand::random;
+
 pub struct BitReader {
     data: Vec<u8>,
     pub pos: usize,
@@ -11,8 +13,12 @@ impl BitReader {
     pub fn read(&mut self, k: u32) -> usize {
         let mut v = 0;
         for _ in 0..k {
-            let byte = self.data.get(self.pos / 8).copied().unwrap_or(0);
-            let bit = (byte >> (7 - self.pos % 8)) & 1;
+            let bit = if self.pos / 8 < self.data.len() {
+                let byte = self.data[self.pos / 8];
+                (byte >> (7 - self.pos % 8)) & 1
+            } else {
+                random::<bool>() as u8
+            };
             v = (v << 1) | bit as usize;
             self.pos += 1;
         }
