@@ -1,7 +1,7 @@
 use crate::bits::{BitReader, bits_for};
 use crate::expr::Expr;
 
-const K: i64 = 6;
+const K: i64 = 30;
 
 fn pick(n: i64, reader: &mut BitReader) -> Expr {
     let mut menu = rewrites(n);
