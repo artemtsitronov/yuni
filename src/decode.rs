@@ -1,37 +1,56 @@
 use crate::bits::bits_for;
 use crate::expr::{Expr, eval};
-use crate::menu::rewrites;
+use crate::menu::{B, HALF, MINLEN};
+use crate::poly::Poly;
 
-pub fn explain_build(n: i64, depth: u32, e: &Expr) -> Option<Vec<bool>> {
-    if eval(e) != n {
+pub fn explain_build(p: &Poly, depth: u32, e: &Expr) -> Option<Vec<bool>> {
+    if eval(e) != *p {
         return None;
     }
-    let menu = rewrites(n);
-    if depth == 0 || menu.is_empty() {
-        return if matches!(e, Expr::Num(_)) {
+    if depth == 0 {
+        return if matches!(e, Expr::Leaf(_)) {
             Some(Vec::new())
         } else {
             None
         };
     }
-    let k = bits_for(menu.len());
-    for idx in 0..(1usize << k) {
-        if let Some(rest) = explain_grow(&menu[idx], e, depth - 1) {
-            let mut bits = idx_to_bits(idx, k);
-            bits.extend(rest);
-            return Some(bits);
+    let l = p.len().max(MINLEN);
+
+    let (fam, a, left, right, lval, rval) = match e {
+        Expr::Add(x, y) => {
+            let a = eval(x);
+            let b = p.sub(&a);
+            (0, a.clone(), x, y, a, b)
         }
+        Expr::Sub(x, y) => {
+            let a = eval(y);
+            let b = p.add(&a);
+            (1, a.clone(), x, y, b, a)
+        }
+        _ => return None,
+    };
+    if a.len() > l {
+        return None;
     }
-    None
+    let mut bits = idx_to_bits(fam, 1);
+    for i in 0..l {
+        let v = a.coeff(i) + HALF;
+        if v < 0 || v >= (1 << B) {
+            return None;
+        }
+        bits.extend(idx_to_bits(v as usize, B));
+    }
+    bits.extend(explain_build(&lval, depth - 1, left)?);
+    bits.extend(explain_build(&rval, depth - 1, right)?);
+    Some(bits)
 }
 
 fn explain_grow(shape: &Expr, e: &Expr, depth: u32) -> Option<Vec<bool>> {
     match (shape, e) {
-        (Expr::Num(n), _) => explain_build(*n, depth, e),
+        (Expr::Leaf(p), _) => explain_build(&p.clone(), depth, e),
         (Expr::Add(a1, b1), Expr::Add(a2, b2))
         | (Expr::Sub(a1, b1), Expr::Sub(a2, b2))
-        | (Expr::Mul(a1, b1), Expr::Mul(a2, b2))
-        | (Expr::Div(a1, b1), Expr::Div(a2, b2)) => {
+        | (Expr::Mul(a1, b1), Expr::Mul(a2, b2)) => {
             let mut bits = explain_grow(&a1, a2, depth)?;
             bits.extend(explain_grow(&b1, b2, depth)?);
             Some(bits)
