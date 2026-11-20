@@ -25,7 +25,3 @@ impl BitReader {
         v
     }
 }
-
-pub fn bits_for(len: usize) -> u32 {
-    len.ilog2()
-}

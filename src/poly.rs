@@ -13,14 +13,6 @@ impl Poly {
         Poly { c }
     }
 
-    pub fn constant(n: i64) -> Poly {
-        Poly::new(vec![n])
-    }
-
-    pub fn x() -> Poly {
-        Poly::new(vec![0, 1])
-    }
-
     pub fn coeff(&self, i: usize) -> i64 {
         self.c.get(i).copied().unwrap_or(0)
     }
@@ -41,27 +33,6 @@ impl Poly {
     pub fn sub(&self, other: &Poly) -> Poly {
         let n = self.len().max(other.len());
         Poly::new((0..n).map(|i| self.coeff(i) - other.coeff(i)).collect())
-    }
-
-    pub fn mul(&self, other: &Poly) -> Poly {
-        if self.len() == 0 || other.len() == 0 {
-            return Poly::new(vec![]);
-        }
-        let mut out = vec![0i64; self.len() + other.len() - 1];
-        for i in 0..self.len() {
-            for j in 0..other.len() {
-                out[i + j] += self.coeff(i) * other.coeff(j)
-            }
-        }
-        Poly::new(out)
-    }
-
-    pub fn pow(&self, e: u32) -> Poly {
-        let mut result = Poly::constant(1);
-        for _ in 0..e {
-            result = result.mul(self);
-        }
-        result
     }
 
     pub fn show(&self) -> String {

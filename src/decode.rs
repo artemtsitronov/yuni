@@ -1,4 +1,3 @@
-use crate::bits::bits_for;
 use crate::expr::{Expr, eval};
 use crate::menu::{B, HALF, MINLEN};
 use crate::poly::Poly;
@@ -36,7 +35,7 @@ pub fn explain_build(p: &Poly, depth: u32, e: &Expr) -> Option<Vec<bool>> {
     let mut bits = idx_to_bits(fam, 1);
     for i in 0..l {
         let v = a.coeff(i) + HALF;
-        if v < 0 || v >= (1 << B) {
+        if !(0..(1 << B)).contains(&v) {
             return None;
         }
         bits.extend(idx_to_bits(v as usize, B));

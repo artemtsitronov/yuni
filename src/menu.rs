@@ -1,4 +1,4 @@
-use crate::bits::{BitReader, bits_for};
+use crate::bits::BitReader;
 use crate::expr::Expr;
 use crate::poly::Poly;
 
