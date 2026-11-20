@@ -1,6 +1,6 @@
 pub struct BitReader {
     data: Vec<u8>,
-    pos: usize,
+    pub pos: usize,
 }
 
 impl BitReader {

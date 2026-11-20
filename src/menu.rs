@@ -10,7 +10,7 @@ fn pick(n: i64, reader: &mut BitReader) -> Expr {
     menu.remove(idx)
 }
 
-fn rewrites(n: i64) -> Vec<Expr> {
+pub fn rewrites(n: i64) -> Vec<Expr> {
     let num = |x: i64| Box::from(Expr::Num(x));
     let mut out = Vec::new();
 
