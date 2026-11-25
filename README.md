@@ -23,7 +23,7 @@ You can encode the same message, and get different results: because the bits lef
 
 ## HOW!?
 
-Different expressions can have the same value, so the shape of an expressio can carry data that the final result doesn't show.
+Different expressions can have the same value, so the shape of an expression can carry data that the final result doesn't show.
 This tool uses it in two places:
 - The result carries the first 24 bits of the message as a polynomial
 - The structure of the expression carries the rest: each `+`/`-` picks a hidden polynomial `A`, and rewrites its value as `A + (value - A)`/`(value + A) - A`. The choices of `A` and choice of `+`/`-` are the message bits. The two halves split the same way again, until the message runs out.
@@ -36,7 +36,7 @@ yuni encode <MESSAGE>
 yuni decode '<EXPRESSION>'
 ```
 
-## Buildin'
+## Building
 
 ```sh
 cargo build --release
