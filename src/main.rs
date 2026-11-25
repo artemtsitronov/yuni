@@ -4,6 +4,7 @@ mod decode;
 mod expr;
 mod frame;
 mod menu;
+mod parse;
 mod poly;
 mod root;
 
@@ -25,8 +26,10 @@ fn encode(msg: &[u8]) -> Expr {
     build(&p, depth, &mut r, total)
 }
 
-fn decode(e: &Expr) -> Option<String> {
-    let bits = explain(e)?;
+fn decode(line: &str) -> Option<String> {
+    let (left, _) = line.split_once('=')?;
+    let e = parse::parse(left)?;
+    let bits = explain(&e)?;
     let bytes = unframe(&bits_to_bytes(&bits))?;
     Some(String::from_utf8_lossy(&bytes).into_owned())
 }
@@ -38,6 +41,9 @@ fn main() {
             let e = encode(message.as_bytes());
             println!("{} = {}", show(&e), eval(&e).show());
         }
-        Cmd::Decode { .. } => todo!(),
+        Cmd::Decode { expr } => match decode(&expr) {
+            Some(msg) => println!("{msg}"),
+            None => println!("OH NO! I COULDN'T DECODE AAAH ( please forgive me )"),
+        },
     }
 }
