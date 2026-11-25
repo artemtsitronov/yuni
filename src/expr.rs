@@ -23,8 +23,21 @@ pub fn superscript(n: u32) -> String {
 }
 
 pub fn show(e: &Expr) -> String {
+    show_at(e, 0)
+}
+
+pub fn show_at(e: &Expr, level: usize) -> String {
+    let (open, close) = if level % 2 == 0 {
+        ('[', ']')
+    } else {
+        ('{', '}')
+    };
     match e {
-        Expr::Add(a, b) => format!("({} + {})", show(a), show(b)),
+        Expr::Add(a, b) => format!(
+            "{open}{} + {}{close}",
+            show_at(a, level + 1),
+            show_at(b, level + 1)
+        ),
         Expr::Leaf(p) => {
             if p.needs_brackets() {
                 format!("({})", p.show())
@@ -32,6 +45,10 @@ pub fn show(e: &Expr) -> String {
                 p.show()
             }
         }
-        Expr::Sub(a, b) => format!("({} - {})", show(a), show(b)),
+        Expr::Sub(a, b) => format!(
+            "{open}{} - {}{close}",
+            show_at(a, level + 1),
+            show_at(b, level + 1)
+        ),
     }
 }
