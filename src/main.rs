@@ -8,6 +8,7 @@ mod poly;
 mod root;
 
 use bits::BitReader;
+use clap::Parser;
 use cli::{Cli, Cmd};
 use decode::{bits_to_bytes, explain};
 use expr::{Expr, eval, show};

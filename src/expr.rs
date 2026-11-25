@@ -14,23 +14,15 @@ pub fn eval(e: &Expr) -> Poly {
     }
 }
 
-pub fn superscript(n: u32) -> String {
-    const SUP: [char; 10] = ['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
-    n.to_string()
-        .chars()
-        .map(|c| SUP[c.to_digit(10).unwrap() as usize])
-        .collect()
-}
-
 pub fn show(e: &Expr) -> String {
     show_at(e, 0)
 }
 
 pub fn show_at(e: &Expr, level: usize) -> String {
     let (open, close) = if level % 2 == 0 {
-        ('[', ']')
+        ("\\left[", "\\right]")
     } else {
-        ('{', '}')
+        ("\\left\\{", "\\right\\}")
     };
     match e {
         Expr::Add(a, b) => format!(
@@ -40,7 +32,7 @@ pub fn show_at(e: &Expr, level: usize) -> String {
         ),
         Expr::Leaf(p) => {
             if p.needs_brackets() {
-                format!("({})", p.show())
+                format!("\\left({}\\right)", p.show())
             } else {
                 p.show()
             }

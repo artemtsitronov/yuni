@@ -1,5 +1,3 @@
-use crate::expr::superscript;
-
 #[derive(Clone, PartialEq, Debug)]
 pub struct Poly {
     c: Vec<i64>,
@@ -61,7 +59,7 @@ impl Poly {
                 s.push('x');
             } else if i > 1 {
                 s.push('x');
-                s.push_str(&superscript(i as u32));
+                s.push_str(&format!("^{{{}}}", i));
             }
         }
         s

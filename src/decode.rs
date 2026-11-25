@@ -21,7 +21,6 @@ pub fn explain_build(p: &Poly, e: &Expr) -> Option<Vec<bool>> {
             let b = p.add(&a);
             (1, a.clone(), x, y, b, a)
         }
-        _ => return None,
     };
     if a.len() > l {
         return None;
