@@ -1,4 +1,5 @@
 use crate::bits::BitReader;
+use crate::menu::{B, MINLEN};
 use crate::poly::Poly;
 
 pub const ROOT_LEN: usize = 3;
@@ -15,7 +16,7 @@ pub fn read_root(reader: &mut BitReader) -> Poly {
 
 pub fn pick_depth(nbits: usize) -> u32 {
     let root = ROOT_LEN * ROOT_B as usize;
-    let pick = 1 + 3 * 6;
+    let pick = 1 + MINLEN * B as usize;
     let mut d = 1;
     while root + ((1usize << d) - 1) * pick < nbits {
         d += 1;
